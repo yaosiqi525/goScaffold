@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"goScaffold/configs"
 	"goScaffold/database"
 	"time"
 
@@ -12,7 +13,8 @@ type jwtToken struct {
 	JwtMiddleware *jwt.Middleware
 }
 
-func (imp *jwtToken) InitJWT() {
+func (imp *jwtToken) init() {
+	JWT.Secret = configs.ConfigUtil.LoginSecret
 	imp.JwtMiddleware = jwt.New(jwt.Config{
 		// ErrorHandler: func(ctx context.Context, err error) {
 		// 	if err == nil {
