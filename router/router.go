@@ -3,6 +3,7 @@ package router
 import (
 	"goScaffold/controllers"
 	"goScaffold/middlewares"
+	"goScaffold/utils"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
@@ -33,7 +34,7 @@ func SetRouter(app *iris.Application) {
 		mainRoute.Post("/login", controllers.Login.Login)
 
 		// 需要登陆权限
-		mainRoute.Get("/userinfo", middlewares.CheckUserInfo, controllers.Login.Index)
+		mainRoute.Get("/userinfo", utils.JWT.JwtMiddleware.Serve, middlewares.CheckUserInfo, controllers.Login.Index)
 	})
 
 	app.Options("*", func(ctx iris.Context) {

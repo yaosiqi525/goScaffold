@@ -3,9 +3,10 @@ package database
 import (
 	"fmt"
 	"goScaffold/configs"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-	log "github.com/jeanphorn/log4go"
+	logger "github.com/jeanphorn/log4go"
 	"github.com/xormplus/xorm"
 	"xorm.io/core"
 )
@@ -21,16 +22,23 @@ func init() {
 	// root:123@(127.0.0.1:3306)/test?charset=utf8
 	dbString = fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s", config.User, config.Password, config.Host, config.Port, config.Database, config.Charset)
 
-	DBUtils, _ = xorm.NewEngine("mysql", dbString)
+	var err error
+	DBUtils, err = xorm.NewEngine("mysql", dbString)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// 打开Sql日志
 	DBUtils.ShowSQL(true)
 	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, "t_")
 	DBUtils.SetTableMapper(tbMapper)
 	initDbTable()
-	log.Info("init db success")
+	logger.Info("init db success")
 	return
 }
 
 func initDbTable() {
-	DBUtils.Sync2(new(User))
+	err := DBUtils.Sync2(new(User))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
