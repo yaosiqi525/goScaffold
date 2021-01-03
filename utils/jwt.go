@@ -13,6 +13,10 @@ type jwtToken struct {
 	JwtMiddleware *jwt.Middleware
 }
 
+func init() {
+	JWT.init()
+}
+
 func (imp *jwtToken) init() {
 	JWT.Secret = configs.ConfigUtil.LoginSecret
 	imp.JwtMiddleware = jwt.New(jwt.Config{
@@ -24,6 +28,7 @@ func (imp *jwtToken) init() {
 		// 	ctx.StatusCode(iris.StatusUnauthorized)
 		// 	ctx.JSON(model.ErrorUnauthorized(err))
 		// },
+		Extractor: jwt.FromAuthHeader,
 
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return []byte(imp.Secret), nil
