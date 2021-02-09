@@ -44,7 +44,8 @@ func (imp *login) Register(ctx iris.Context) {
 	// 写入数据库
 	registed.Name = params.Name
 	registed.Phone = params.Phone
-	registed.Password = params.Password
+	// 密码使用md5,看不到密码
+	registed.Password = string(utils.GetMd5String([]byte(params.Password)))
 	database.DBUtils.Insert(registed)
 
 	// 生成token
@@ -53,7 +54,7 @@ func (imp *login) Register(ctx iris.Context) {
 	return
 }
 
-// Login 注册
+// Login 登陆
 func (imp *login) Login(ctx iris.Context) {
 	ctx.StatusCode(iris.StatusOK)
 	var params registerParams
@@ -64,7 +65,8 @@ func (imp *login) Login(ctx iris.Context) {
 	}
 	// 检查是否已注册
 	var registed database.User
-	database.DBUtils.Where("phone = ? and password = ?", params.Phone, params.Password).Get(&registed)
+	password := string(utils.GetMd5String([]byte(params.Password)))
+	database.DBUtils.Where("phone = ? and password = ?", params.Phone, password).Get(&registed)
 	if registed.Name == "" {
 		ctx.JSON(ApiResource(ERROR, nil, "未注册"))
 		return
@@ -72,7 +74,7 @@ func (imp *login) Login(ctx iris.Context) {
 
 	// 生成token
 	token := utils.JWT.GenerateJwtToken(&registed)
-	ctx.JSON(ApiResource(SUCCESS, token, "注册成功"))
+	ctx.JSON(ApiResource(SUCCESS, token, "登陆成功"))
 	return
 }
 

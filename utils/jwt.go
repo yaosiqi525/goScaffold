@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"goScaffold/configs"
 	"goScaffold/database"
 	"time"
 
@@ -12,7 +13,12 @@ type jwtToken struct {
 	JwtMiddleware *jwt.Middleware
 }
 
-func (imp *jwtToken) InitJWT() {
+func init() {
+	JWT.init()
+}
+
+func (imp *jwtToken) init() {
+	JWT.Secret = configs.ConfigUtil.LoginSecret
 	imp.JwtMiddleware = jwt.New(jwt.Config{
 		// ErrorHandler: func(ctx context.Context, err error) {
 		// 	if err == nil {
@@ -22,6 +28,7 @@ func (imp *jwtToken) InitJWT() {
 		// 	ctx.StatusCode(iris.StatusUnauthorized)
 		// 	ctx.JSON(model.ErrorUnauthorized(err))
 		// },
+		Extractor: jwt.FromAuthHeader,
 
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return []byte(imp.Secret), nil
